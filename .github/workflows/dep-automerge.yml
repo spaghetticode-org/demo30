@@ -1,21 +1,67 @@
-name: dep-auto-merge
+# funziona ma mergia subito senza aspettare la build
+# name: Auto approve and merge PRs by dependabot
+# # Trigger the workflow on pull request
+# on:
+#   pull_request
 
+# jobs:
+#   autoapprove:
+#     name: Auto Approve a PR by dependabot # Name of the job
+#     runs-on: ubuntu-latest # Environment on which the job runs
+#     steps:
+#       - name: Auto approve
+#         uses: hmarr/auto-approve-action@v2.0.0 # Custom action for auto approval already available on marketplace
+#         # Perform the auto approve action only when the PR is raised by dependabot
+#         if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
+#         with:
+#           # Create a personal access token and store it under the Secrets section of the particular repository
+#           # with the key "GITHUB_ACTIONS_TOKEN"
+#           github-token: ${{ secrets.ANDREA_GITHUB_TOKEN }}
+#   automerge:
+#     name: Auto merge after successful checks
+#     # By default, jobs run in parallel. To run the jobs sequentially, they keywords "needs" is needed.
+#     # Auto merge action can be done only when the PR is approved, hence this automerge needs autoapprove as a prerequisite
+#     needs: autoapprove
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Auto merge
+#         # Custom action for auto merging already available on marketplace
+#         uses: pascalgn/automerge-action@135f0bdb927d9807b5446f7ca9ecc2c51de03c4a
+#         # Perform the auto merge action only when the PR is raised by dependabot
+#         if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.ANDREA_GITHUB_TOKEN }}
+#           # By default, whenever dependabot raises a PR, it automatically assigns a label named "dependencies"
+#           # So, this action merges those PRs labelled "dependencies" only
+#           MERGE_LABELS: dependencies
+#           MERGE_METHOD: merge
+
+
+
+
+name: dep-auto-merge
 on:
   # scheduler: doesn't work, it will say "action triggered outside of a pull_request"
   # - cron:  '*/5 13-14 * * *' # UTC apparently
   # `pull_request` doesn't work properly, it cannot find the GH token. We need to use pull_request_target:
   # auto-merge / auto-merge (pull_request) Failing after 11s
   # Error: Input required and not supplied: github-token
-  pull_request_target:
+  # pull_request_target:
   # pull_request_review:
   #   types: [submitted] # doesn't work. it will run after the PR is approved by somebody and will output `Error: action triggered outside of a pull_request`
+
+  pull_request:
+  # schedule simply will be ignored
+  # schedule:
+  #   # https://crontab.guru/every-hour
+  #   - cron: '30 * * * 1-5'
 
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+      - uses: spaghetticode/action-dependabot-auto-merge@3ddb2660dcc68d3dac95e08e98a69f5ecb8b1d89
         with:
           target: major
           github-token: ${{ secrets.ANDREA_GITHUB_TOKEN }}
@@ -24,3 +70,41 @@ jobs:
           # Sorry, only users with push access can use that command.
           # github-token: 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 you cannot put the token in the codebase:
           # Error: Bad credentials
+
+
+
+
+# works, but needs a comment in the PR description for the time of merging
+# /schedule 2022-11-01 09:40:00
+# see https://dev.to/gr2m/schedule-github-pull-request-merges-using-actions-h38
+# schedule here also required, or the pr will be marked for merging but it won't happen
+# name: Merge Schedule
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - edited
+#       - synchronize
+#   schedule:
+#     # https://crontab.guru/every-hour
+#     - cron: '31 * * * 1-5'
+
+# jobs:
+#   merge_schedule:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: gr2m/merge-schedule-action@v2
+#         with:
+#           # Merge method to use. Possible values are merge, squash or
+#           # rebase. Default is merge.
+#           # merge_method: merge
+#           # Time zone to use. Default is UTC.
+#           # time_zone: 'America/Los_Angeles'
+#           # Require all pull request statuses to be successful before
+#           # merging. Default is `false`.
+#           require_statuses_success: 'true'
+#           # Label to apply to the pull request if the merge fails. Default is
+#           # `automerge-fail`.
+#           # automerge_fail_label: 'merge-schedule-failed'
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.ANDREA_GITHUB_TOKEN }}
