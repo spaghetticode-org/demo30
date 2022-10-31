@@ -1,0 +1,26 @@
+name: dep-auto-merge
+
+on:
+  # scheduler: doesn't work, it will say "action triggered outside of a pull_request"
+  # - cron:  '*/5 13-14 * * *' # UTC apparently
+  # `pull_request` doesn't work properly, it cannot find the GH token. We need to use pull_request_target:
+  # auto-merge / auto-merge (pull_request) Failing after 11s
+  # Error: Input required and not supplied: github-token
+  pull_request_target:
+  # pull_request_review:
+  #   types: [submitted] # doesn't work. it will run after the PR is approved by somebody and will output `Error: action triggered outside of a pull_request`
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+        with:
+          target: major
+          github-token: ${{ secrets.ANDREA_GITHUB_TOKEN }}
+          # github-token: ${{ secrets.GITHUB_TOKEN }} doesn't work, it says
+          # dependabot (bot) commented on behalf of github 12 days ago
+          # Sorry, only users with push access can use that command.
+          # github-token: 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 you cannot put the token in the codebase:
+          # Error: Bad credentials
