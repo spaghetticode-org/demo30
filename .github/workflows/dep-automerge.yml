@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: spaghetticode/action-dependabot-auto-merge@911f99e0849624631fe7a60645492d5da0ffb2db
+      - uses: spaghetticode/action-dependabot-auto-merge@3d25f46de0269857bdeee780881c0496efaffcb9
         with:
           target: major
           github-token: ${{ secrets.ANDREA_GITHUB_TOKEN }}
