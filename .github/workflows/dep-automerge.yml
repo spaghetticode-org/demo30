@@ -41,9 +41,10 @@
 
 name: dep-auto-merge
 on:
+  pull_request:
   # scheduler: doesn't work, it will say "action triggered outside of a pull_request"
   # - cron:  '*/5 13-14 * * *' # UTC apparently
-  scheduler: doesn't work, it will say "action triggered outside of a pull_request"
+  schedule: #doesn't work, it will say "action triggered outside of a pull_request"
     - cron:  '*/5 9-12 * * *' # UTC apparently
 
   # `pull_request` doesn't work properly, it cannot find the GH token. We need to use pull_request_target:
@@ -64,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: spaghetticode/action-dependabot-auto-merge@56063683923259b17220aa9a260b24f303f0f310
+      - uses: spaghetticode/action-dependabot-auto-merge@911f99e0849624631fe7a60645492d5da0ffb2db
         with:
           target: major
           github-token: ${{ secrets.ANDREA_GITHUB_TOKEN }}
